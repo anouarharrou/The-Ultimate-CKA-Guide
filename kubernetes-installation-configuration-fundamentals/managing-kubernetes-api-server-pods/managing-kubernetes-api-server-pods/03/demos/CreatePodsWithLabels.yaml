@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-1
+  labels: 
+    app: MyWebApp
+    deployment: v1
+    tier: prod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-2
+  labels: 
+    app: MyWebApp
+    deployment: v1.1
+    tier: prod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-3
+  labels: 
+    app: MyWebApp
+    deployment: v1.1
+    tier: qa
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-4
+  labels: 
+    app: MyAdminApp
+    deployment: v1
+    tier: prod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+---

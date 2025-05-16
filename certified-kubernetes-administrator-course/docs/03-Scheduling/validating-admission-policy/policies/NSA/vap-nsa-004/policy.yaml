@@ -1,0 +1,32 @@
+# Validating Admission Policy
+# Name: Prevent containers from accessing underlying host
+# Docs: https://hub.datree.io/built-in-rules/prevent-accessing-underlying-host
+# Severity: Low
+
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: "vap-nsa-004-prevent-containers-from-accessing-underlying-host"
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
+      - apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["jobs", "cronjobs"]
+  validations:
+    - expression: "object.kind != 'Pod' || object.spec.volumes.all(vol, !(has(vol.hostPath)))"
+      message: "Invalid key `hostPath` - refrain from using this mount to prevent an attack on the underlying host (see more at https://hub.datree.io/built-in-rules/prevent-accessing-underlying-host)"
+    - expression: "['Deployment','ReplicaSet','DaemonSet','StatefulSet','Job'].all(kind, object.kind != kind) || object.spec.template.spec.volumes.all(vol, !(has(vol.hostPath)))"
+      message: "Invalid key `hostPath` - refrain from using this mount to prevent an attack on the underlying host (see more at https://hub.datree.io/built-in-rules/prevent-accessing-underlying-host)"
+    - expression: "object.kind != 'CronJob' || object.spec.jobTemplate.spec.volumes.all(vol, !(has(vol.hostPath)))"
+      message: "Invalid key `hostPath` - refrain from using this mount to prevent an attack on the underlying host (see more at https://hub.datree.io/built-in-rules/prevent-accessing-underlying-host)"

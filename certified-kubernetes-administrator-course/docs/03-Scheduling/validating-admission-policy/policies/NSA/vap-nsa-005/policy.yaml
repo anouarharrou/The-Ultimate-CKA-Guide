@@ -1,0 +1,32 @@
+# Validating Admission Policy
+# Name: Prevent containers from escalating privileges
+# Docs: https://hub.datree.io/built-in-rules/prevent-escalating-privileges
+# Severity: Low
+
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: "vap-nsa-005-prevent-containers-from-escalating-privileges"
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
+      - apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["jobs", "cronjobs"]
+  validations:
+    - expression: "object.kind != 'Pod' || object.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.allowPrivilegeEscalation) &&  container.securityContext.allowPrivilegeEscalation == false)"
+      message: "Missing key `allowPrivilegeEscalation` - set to false to prevent attackers from exploiting escalated container privileges (see more at  https://hub.datree.io/built-in-rules/prevent-escalating-privileges)"
+    - expression: "['Deployment','ReplicaSet','DaemonSet','StatefulSet','Job'].all(kind, object.kind != kind) || object.spec.template.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.allowPrivilegeEscalation) &&  container.securityContext.allowPrivilegeEscalation == false)"
+      message: "Missing key `allowPrivilegeEscalation` - set to false to prevent attackers from exploiting escalated container privileges (see more at  https://hub.datree.io/built-in-rules/prevent-escalating-privileges)"
+    - expression: "object.kind != 'CronJob' || object.spec.jobTemplate.spec.template.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.allowPrivilegeEscalation) &&  container.securityContext.allowPrivilegeEscalation == false)"
+      message: "Missing key `allowPrivilegeEscalation` - set to false to prevent attackers from exploiting escalated container privileges (see more at  https://hub.datree.io/built-in-rules/prevent-escalating-privileges)"

@@ -1,0 +1,11 @@
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: "demo-binding.datree.io"
+spec:
+  policyName: demo-vap.datree.io
+  validationActions: [Deny]
+  matchResources:
+    objectSelector:
+      matchLabels:
+        example: test

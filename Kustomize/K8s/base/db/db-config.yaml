@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-credentials
+data:
+  username: "root"
+  password: "paddwrd"

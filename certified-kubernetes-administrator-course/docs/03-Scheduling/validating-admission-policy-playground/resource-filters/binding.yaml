@@ -1,0 +1,23 @@
+---
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: "demo-binding-test.example.com"
+spec:
+  policyName: "demo-policy.example.com"
+  validationActions: [Deny]
+  matchResources:
+    excludeResourceRules:
+      # exclude all resources in the rbac.authorization.k8s.io API group
+      - apiGroups:   ["rbac.authorization.k8s.io"]
+        apiVersions: ["*"]
+        operations:  ["*"]
+        resources:   ["*"]
+      # exclude resource type leases from the coordination.k8s.io API group
+      - apiGroups:   ["coordination.k8s.io"]
+        apiVersions: ["*"]
+        operations:  ["*"]
+        resources:   ["leases"]
+    namespaceSelector:
+      matchLabels:
+        environment: demo

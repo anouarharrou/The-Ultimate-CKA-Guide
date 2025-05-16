@@ -1,0 +1,32 @@
+# Validating Admission Policy
+# Name: Prevent containers from accessing host files by using high UIDs
+# Docs: https://hub.datree.io/built-in-rules/prevent-uid-conflicts
+# Severity: Medium
+
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: "vap-nsa-003-prevent-containers-from-accessing-host-files-by-using-high-uids"
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
+      - apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["jobs", "cronjobs"]
+  validations:
+    - expression: "object.kind != 'Pod' || object.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.runAsUser) &&  container.securityContext.runAsUser > 9999)"
+      message: "Incorrect value for key `runAsUser` - value should be above 9999 to reduce the likelihood that the UID is already taken (see more at https://hub.datree.io/built-in-rules/prevent-uid-conflicts)"
+    - expression: "['Deployment','ReplicaSet','DaemonSet','StatefulSet','Job'].all(kind, object.kind != kind) || object.spec.template.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.runAsUser) &&  container.securityContext.runAsUser > 9999)"
+      message: "Incorrect value for key `runAsUser` - value should be above 9999 to reduce the likelihood that the UID is already taken (see more at https://hub.datree.io/built-in-rules/prevent-uid-conflicts)"
+    - expression: "object.kind != 'CronJob' || object.spec.jobTemplate.spec.template.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.runAsUser) &&  container.securityContext.runAsUser > 9999)"
+      message: "Incorrect value for key `runAsUser` - value should be above 9999 to reduce the likelihood that the UID is already taken (see more at https://hub.datree.io/built-in-rules/prevent-uid-conflicts)"

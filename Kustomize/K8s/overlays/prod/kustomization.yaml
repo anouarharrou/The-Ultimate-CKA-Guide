@@ -1,0 +1,14 @@
+bases:
+  - ../../base
+
+resources:
+  - redis-depl.yaml
+
+patchesStrategicMerge:
+  - api-patch.yaml
+
+components:
+  - ../../comppnents/monitoring
+  -  ../../comppnents/cache
+
+namespace: prod

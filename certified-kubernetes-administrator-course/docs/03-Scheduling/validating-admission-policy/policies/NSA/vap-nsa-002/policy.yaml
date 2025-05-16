@@ -1,0 +1,32 @@
+# Validating Admission Policy
+# Name: Prevent containers from accessing host files by using high GIDs
+# Docs: https://hub.datree.io/built-in-rules/prevent-accessing-host-files-by-using-high-gids
+# Severity: Low
+
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: "vap-nsa-002-prevent-containers-from-accessing-host-files-by-using-high-gids"
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
+      - apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["jobs", "cronjobs"]
+  validations:
+    - expression: "object.kind != 'Pod' || object.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.runAsGroup) &&  container.securityContext.runAsGroup < 1000)"
+      message: "Set the runAsGroup to a value that lower than 1000 (see more at  https://hub.datree.io/built-in-rules/prevent-accessing-host-files-by-using-high-gids)"
+    - expression: "['Deployment','ReplicaSet','DaemonSet','StatefulSet','Job'].all(kind, object.kind != kind) || object.spec.template.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.runAsGroup) &&  container.securityContext.runAsGroup < 1000)"
+      message: "Set the runAsGroup to a value that lower than 1000 (see more at  https://hub.datree.io/built-in-rules/prevent-accessing-host-files-by-using-high-gids)"
+    - expression: "object.kind != 'CronJob' || object.spec.jobTemplate.spec.template.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.runAsGroup) &&  container.securityContext.runAsGroup < 1000)"
+      message: "Set the runAsGroup to a value that lower than 1000 (see more at  https://hub.datree.io/built-in-rules/prevent-accessing-host-files-by-using-high-gids)"

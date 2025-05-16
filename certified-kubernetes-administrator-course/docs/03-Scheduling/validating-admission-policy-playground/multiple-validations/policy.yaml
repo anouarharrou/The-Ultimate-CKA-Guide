@@ -1,0 +1,20 @@
+---
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: "demo-policy.example.com"
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups:   ["apps"]
+        apiVersions: ["v1"]
+        operations:  ["CREATE", "UPDATE"]
+        resources:   ["deployments"]
+  validations:
+    # Deployments can't have more than 3 replicas
+    - expression: "object.spec.replicas <= 3"
+    # Deployment containers must be using images hosted in europe-west1 Artifact Registry in project test-eyal
+    - expression: "object.spec.template.spec.containers.all(c, c.image.startsWith('europe-west1-docker.pkg.dev/test-eyal/'))"
+    # Deployment cannot use emptyDir volumes
+    - expression: "!has(object.spec.template.spec.volumes) || object.spec.template.spec.volumes.all(v, !has(v.emptyDir))"

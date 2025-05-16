@@ -1,0 +1,19 @@
+---
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: "demo-policy.example.com"
+spec:
+  failurePolicy: Fail
+  paramKind:
+    apiVersion: example.com/v1
+    kind: Parameters
+  matchConstraints:
+    resourceRules:
+      - apiGroups:   ["apps"]
+        apiVersions: ["v1"]
+        operations:  ["CREATE", "UPDATE"]
+        resources:   ["deployments"]
+  validations:
+    - expression: "object.spec.replicas <= params.maxReplicas"
+      messageExpression: "'Deployments cannot have more than ' + string(params.maxReplicas) + ' replicas, this one has ' + string(object.spec.replicas)"

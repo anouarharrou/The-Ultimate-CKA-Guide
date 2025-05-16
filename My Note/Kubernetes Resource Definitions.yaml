@@ -1,0 +1,302 @@
+# Kubernetes Resource Definitions and Usage Examples
+
+# 1. Pod Example
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+  namespace: default
+  labels:
+    app: my-app
+spec:
+  containers:
+    - name: my-container
+      image: my-app-image:latest
+      ports:
+        - containerPort: 80
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "250m"
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+
+# 2. Deployment Example
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+  namespace: default
+  labels:
+    app: my-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-container
+          image: my-app-image:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+
+# 3. Service Example
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+  namespace: default
+spec:
+  selector:
+    app: my-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+
+# 4. ConfigMap Example
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+  namespace: default
+data:
+  config.json: |
+    {
+      "logLevel": "info",
+      "port": 8080
+    }
+
+# 5. Secret Example
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-secret
+  namespace: default
+type: Opaque
+data:
+  password: cGFzc3dvcmQ=  # base64 encoded ("password")
+
+# 6. Role and RoleBinding Example
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: my-role
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: my-role-binding
+  namespace: default
+subjects:
+  - kind: User
+    name: my-user
+    apiGroup: ""
+roleRef:
+  kind: Role
+  name: my-role
+  apiGroup: ""
+
+# 7. PersistentVolumeClaim Example
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+# 8. Job Example
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: my-job
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+        - name: my-job-container
+          image: busybox
+          command: ["echo", "Hello Kubernetes"]
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+      restartPolicy: Never
+
+# 9. CronJob Example
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: my-cronjob
+  namespace: default
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: my-cronjob-container
+              image: busybox
+              command: ["sh", "-c", "echo Scheduled Job Running"]
+          restartPolicy: OnFailure
+
+# 10. NetworkPolicy Example
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: my-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: my-app
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              access: "true"
+      ports:
+        - protocol: TCP
+          port: 80
+# 11. ReplicaSet Example
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: myapp-replicaset
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: myapp
+      type: front-end
+  template:
+    metadata:
+      labels:
+        app: myapp
+        type: front-end
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+
+# 12. ReplicationController Example
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: app-rc
+  namespace: default
+  labels:
+    app: MYAPP
+    type: frontend
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: MYAPP
+        type: frontend
+    spec:
+      containers:
+      - name: MYAPP
+        image: nginx
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+
+# 13. ResourceQuota Example
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: quota-name
+  namespace: quota-ns
+spec:
+  hard:
+    requests.cpu: '1'
+    requests.memory: 1Gi
+    limits.cpu: '2'
+    limits.memory: 2Gi
+    pods: '2'
+    persistentvolumeclaims: '5'
+    requests.storage: 5Gi
+
+# 14. Ingress Example
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: myapp.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-service
+                port:
+                  number: 80

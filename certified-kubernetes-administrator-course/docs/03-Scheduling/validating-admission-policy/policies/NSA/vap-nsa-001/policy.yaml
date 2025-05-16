@@ -1,0 +1,32 @@
+# Validating Admission Policy
+# Name: Ensure each container has a read-only root filesystem
+# Docs: https://hub.datree.io/built-in-rules/ensure-read-only-filesystem
+# Severity: High
+
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: "vap-nsa-001-ensure-each-container-has-a-read-only-root-filesystem"
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
+      - apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["jobs", "cronjobs"]
+  validations:
+    - expression: "object.kind != 'Pod' || object.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.readOnlyRootFilesystem) &&  container.securityContext.readOnlyRootFilesystem == true)"
+      message: "Set the readOnlyRootFilesystem key to true at either the pod level or container level. (see more at https://hub.datree.io/built-in-rules/ensure-read-only-filesystem)"
+    - expression: "['Deployment','ReplicaSet','DaemonSet','StatefulSet','Job'].all(kind, object.kind != kind) || object.spec.template.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.readOnlyRootFilesystem) &&  container.securityContext.readOnlyRootFilesystem == true)"
+      message: "Set the readOnlyRootFilesystem key to true either at the container level or within the workloads. (see more at https://hub.datree.io/built-in-rules/ensure-read-only-filesystem)"
+    - expression: "object.kind != 'CronJob' || object.spec.jobTemplate.spec.template.spec.containers.all(container, has(container.securityContext) && has(container.securityContext.readOnlyRootFilesystem) &&  container.securityContext.readOnlyRootFilesystem == true)"
+      message: "Set the readOnlyRootFilesystem key to true either at the container level or within the workloads. (see more at https://hub.datree.io/built-in-rules/ensure-read-only-filesystem)"

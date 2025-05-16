@@ -1,0 +1,6 @@
+bases:
+  - ../../base
+
+patchesStrategicMerge:
+  - api-patch.yaml
+namespace: dev

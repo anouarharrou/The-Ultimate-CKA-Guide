@@ -1,0 +1,25 @@
+# Validating Admission Policy
+# Name: Ensure that default service accounts are not actively used
+# Docs: https://hub.datree.io/built-in-rules/ensure-default-service-account-not-used
+# Severity: Low
+
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: "vap-cis-003-ensure-that-default-service-accounts-are-not-actively-used"
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods", "serviceaccounts"]
+  validations:
+    - expression: >
+        object.kind != 'ServiceAccount' ||
+        (
+          has(object.automountServiceAccountToken) &&
+          object.automountServiceAccountToken == false
+        )
+      message: "Invalid value for key `automountServiceAccountToken` - set to `false` to ensure rights can be more easily audited (see more at  https://hub.datree.io/built-in-rules/ensure-default-service-account-not-used)"

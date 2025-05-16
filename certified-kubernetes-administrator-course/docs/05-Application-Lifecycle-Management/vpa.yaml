@@ -1,0 +1,48 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: my-app-vpa
+  namespace: default  # Namespace where your target deployment lives
+spec:
+  targetRef:  # REQUIRED - the workload you want to autoscale (can be Deployment, StatefulSet, etc.)
+    apiVersion: "apps/v1"
+    kind:       Deployment
+    name:       my-app
+
+  updatePolicy:  # Controls how and when resources are updated
+    updateMode: "Auto"  
+    # Options:
+    # "Off"   - VPA only provides recommendations (does not apply changes)
+    # "Initial" - Applies resources only at pod creation
+    # "Auto" - Actively updates pods by evicting and recreating with new resources
+
+    minReplicas: 2  
+    # Optional: Minimum number of pods to maintain when doing updates (for high availability)
+
+  resourcePolicy:  # Optional: Set per-container limits or constraints
+    containerPolicies:
+    - containerName: "*"  # Wildcard = applies to all containers
+      mode: "Auto"  # Options: "Auto", "Off"
+      minAllowed:   # Set minimum allowed resources
+        cpu:    "100m"
+        memory: "256Mi"
+      maxAllowed:   # Set maximum allowed resources
+        cpu:    "1000m"
+        memory: "2Gi"
+      controlledResources: ["cpu", "memory"]  
+      # Optional: explicitly list which resources to control (can omit for both)
+
+      controlledValues: "RequestsAndLimits"
+      # Options:
+      # - "RequestsOnly" (default): VPA only adjusts resource requests
+      # - "RequestsAndLimits": adjusts both requests and limits
+
+  recommenderName: "default"  
+  # Optional: Choose which recommender to use if you have custom ones installed
+
+status:
+  # This section is filled by Kubernetes controller (you never write this manually)
+  # Includes:
+  # - last recommendation
+  # - last update time
+  # - conditions (e.g., whether recommendation is valid)

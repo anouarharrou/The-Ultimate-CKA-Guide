@@ -1,0 +1,32 @@
+# Validating Admission Policy
+# Name: Ensure containers and pods have a configured security context
+# Docs: https://hub.datree.io/built-in-rules/ensure-containers-pods-security-context
+# Severity: Medium
+
+apiVersion: admissionregistration.k8s.io/v1alpha1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: "vap-cis-001-ensure-containers-and-pods-have-a-configured-security-context"
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
+      - apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["jobs", "cronjobs"]
+  validations:
+    - expression: "object.kind != 'Pod' || object.spec.containers.all(container, has(container.securityContext))"
+      message: "Missing key `securityContext` - set to enforce your containers' security and stability. (see more at https://hub.datree.io/built-in-rules/ensure-containers-pods-security-context)"
+    - expression: "['Deployment','ReplicaSet','DaemonSet','StatefulSet','Job'].all(kind, object.kind != kind) || object.spec.template.spec.containers.all(container, has(container.securityContext))"
+      message: "Missing key `securityContext` - set to enforce your containers' security and stability. (see more at https://hub.datree.io/built-in-rules/ensure-containers-pods-security-context)"
+    - expression: "object.kind != 'CronJob' || object.spec.jobTemplate.spec.template.spec.containers.all(container, has(container.securityContext))"
+      message: "Missing key `securityContext` - set to enforce your containers' security and stability. (see more at https://hub.datree.io/built-in-rules/ensure-containers-pods-security-context)"
