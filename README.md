@@ -82,5 +82,5 @@ Perfect for daily reference or last-minute review before the exam.
 ## 🧪 How to Use
 
 ```bash
-git clone https://github.com/anouarharrou/cka.git
-cd cka
+git clone https://github.com/anouarharrou/The-Ultimate-CKA-Guide.git
+cd The-Ultimate-CKA-Guide
