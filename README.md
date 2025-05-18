@@ -8,13 +8,17 @@ Welcome to the **CKA Power Repo** — your one-stop shop for **Certified Kuberne
 
 Here’s what you’ll find inside:
 
-### 🎓 `The-Ultimate-CKA-Guide/`
+### 🎓 `certified-kubernetes-administrator-course/`
 Comprehensive resources from the **KodeKloud CKA course**, including:
-- Manifests 🧾
-- Lab files 🧪
-- Exam scenarios 🔧
-- PDF guides 📄  
-Ideal for structured CKA prep.
+- **Core Topics**: Introduction, Core Concepts, Scheduling, Logging, Security, Storage, Networking, and more 📚
+- **Specialized Sections**:
+  - `validating-admission-policy/`: Policies (CIS, CVE, NSA), resources, and playground for admission control 🛡️
+  - `kubeadm-clusters/`: Setup guides for Apple Silicon, AWS, VirtualBox, and more 🌐
+  - `managed-clusters/`: AKS, EKS, GKE console docs and images ☁️
+- **Exam Prep**:
+  - Mock exams, Ultimate Mocks (Troubleshooting, Storage, Networking) 🧪
+  - Lightning Labs and tips-and-tricks for exam success 💡
+- Manifests, lab files, and PDF guides for structured CKA prep.
 
 ---
 
@@ -22,7 +26,7 @@ Ideal for structured CKA prep.
 A hands-on demo and guide to:
 - Create and bind ServiceAccounts ✅
 - Use Kubernetes **RBAC** for fine-grained access control 🔐
-- Grant access to dev users via certificates and roles  
+- Grant access to users (e.g., John) and developers via ServiceAccounts  
 Perfect for real-world **access management** scenarios.
 
 ---
@@ -41,7 +45,7 @@ Offline, DMZ-friendly cluster setup guide:
 - Scripted installation using `kubeadm` ⚙️
 - One machine holds all necessary **packages and images** 📦
 - Ideal for air-gapped or **production-like isolated environments**  
-Think of it as the automated “hard way” with real-world twist.
+Think of it as the automated “hard way” with a real-world twist.
 
 ---
 
@@ -57,7 +61,7 @@ If you're diving into **service mesh**, this is your playground.
 ### 🧠 `kubernetes-installation-configuration-fundamentals/`
 Course content from **Anthony E. Nocentino**, including:
 - Install & configuration best practices ⚙️
-- PowerPoint slide decks 🎞️
+- Demos for Kubernetes API server and pod management 🖥️
 - Lab and demo files for deeper learning  
 A great **complementary resource** to the KodeKloud CKA path.
 
@@ -65,14 +69,24 @@ A great **complementary resource** to the KodeKloud CKA path.
 
 ### 🧩 `Kustomize/`
 Practical **Kustomize project** layout:
-- `base/`, `components/`, `overlays/` (e.g., `dev`, `qa`, etc.) 🧱
-- Learn to patch, override, and configure like a pro  
-Make your deployments **environment-aware and DRY**.
+- `base/`: Database (SQL/NoSQL) and Nginx configurations 🧱
+- `components/`: Cache and monitoring setups ⚙️
+- `overlays/`: Environment-specific configs (dev, QA, staging, prod) 🌍  
+Learn to patch, override, and configure like a pro for **environment-aware and DRY** deployments.
+
+---
+
+### 🖥️ `MicroK8s/`
+Resources for **MicroK8s** setup and usage:
+- Lightweight Kubernetes for development and testing 🛠️
+- Guides and scripts for quick cluster deployment  
+Ideal for local experimentation or small-scale environments.
 
 ---
 
 ### ✍️ `My Note/`
 Your goldmine of CKA hacks and operational tips:
+- **Killer Shell Exam Simulators**: Notes and files for exam practice 🧪
 - Real-world commands, use cases, and tricks 💡
 - Resource links, CLI shortcuts, best practices  
 Perfect for daily reference or last-minute review before the exam.
